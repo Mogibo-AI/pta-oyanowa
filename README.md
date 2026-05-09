@@ -1,2 +1,3 @@
 # pta-oyanowa
-みんなのPTA — おやのわ
+
+全自動 PTA - おやのわ
