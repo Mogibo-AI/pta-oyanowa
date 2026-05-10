@@ -5,7 +5,7 @@
 - **Project Type**: Greenfield
 - **Start Date**: 2026-05-09T00:00:00Z
 - **Current Phase**: INCEPTION
-- **Current Stage**: Workflow Planning (完了 / 承認待ち) → Application Design (次)
+- **Current Stage**: Application Design (進行中 / Plan 段階)
 
 ## Workspace State
 - **Existing Code**: No
@@ -37,8 +37,8 @@
 - [ ] Reverse Engineering — SKIP（Greenfield のため）
 - [x] Requirements Analysis — 完了・承認済み（2026-05-09、追加要望3件反映済）
 - [x] User Stories — 完了・承認済み（2026-05-09、5ペルソナ + 31ストーリー、F-10 反映済）
-- [x] Workflow Planning — 完了（2026-05-09、ユーザー承認待ち）
-- [ ] Application Design — EXECUTE 判定（次ステージ）
+- [x] Workflow Planning — 完了・承認済み（2026-05-09、F-11 反映済）
+- [ ] Application Design — 進行中（Plan 段階、ユーザー指示により実施: 2026-05-09）
 - [ ] Units Generation — EXECUTE 判定（Application Design 後）
 
 ### CONSTRUCTION PHASE
