@@ -158,3 +158,11 @@
 他のドキュメント（requirements.md, stories.md, personas.md, execution-plan.md）は日本語の「チェックイン」のみで該当英表記なし、変更不要。
 
 ---
+
+## Application Design - ユーザー承認 / Units Generation 開始
+**Timestamp**: 2026-05-09T03:55:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: Application Design ステージ承認済みとマーク。Units Generation ステージ（INCEPTION 最終）開始。Plan 段階で `aidlc-docs/inception/plans/unit-of-work-plan.md` を生成（9問の質問: セクションA[コア6問: 14ユニット構成確定 / AIユニット粒度 / 共有パッケージ粒度 / インフラユニット粒度 / デプロイ独立性 / チーム構成] / セクションB[2問: 横断ストーリー所属 / F-09 Coming Soon ストーリー所属] / セクションC[自由記入]、セクションDで Phase D-1〜D-5 の実行計画）。
+**Context**: ⛔ GATE: Plan 段階のユーザー回答待ち。「ユニット計画承認」を受けるまで成果物生成（unit-of-work.md / unit-of-work-dependency.md / unit-of-work-story-map.md）には進まない。
+
+---
