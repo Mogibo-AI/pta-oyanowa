@@ -241,11 +241,11 @@ DynamoDB Streams (非同期)
 
 イベント当日
   → 保護者がアプリで「チェックイン」
-  → C-BE-EVENT.checkinEvent (QR or Tap, B-7 X)
-  → DynamoDB.PutItem (Checkin)
+  → C-BE-EVENT.checkInEvent (QR or Tap, B-7 X)
+  → DynamoDB.PutItem (CheckIn)
 
 管理者 (リアルタイム)
-  → 管理画面で C-BE-EVENT.listEventCheckins
+  → 管理画面で C-BE-EVENT.listEventCheckIns
   → 5秒間隔ポーリングでリアルタイム表示
 ```
 
@@ -326,7 +326,7 @@ Level 0: AWS Services (Cognito, DynamoDB, S3, SNS, EventBridge, Bedrock)
 | 月次レポート | `SCHOOL#{schoolId}` | `REPORT#{yyyy-mm}` | – |
 | イベント企画案 | `SCHOOL#{schoolId}` | `EVENT#{eventId}` | GSI3: by status |
 | 投票 | `SCHOOL#{schoolId}` | `EVENT#{eventId}#VOTE#{userId}` | – |
-| チェックイン | `SCHOOL#{schoolId}` | `EVENT#{eventId}#CHECKIN#{userId}` | – |
+| チェックイン | `SCHOOL#{schoolId}` | `EVENT#{eventId}#CHECK_IN#{userId}` | – |
 | 操作ログ | `SCHOOL#{schoolId}` | `OPLOG#{ulid}` | GSI4: timestamp ソート |
 | デバイストークン | `SCHOOL#{schoolId}` | `DEVICE#{userId}` | – |
 

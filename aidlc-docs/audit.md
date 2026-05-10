@@ -145,3 +145,16 @@
 **Context**: ⛔ GATE: Application Design 全体の承認待ち。承認後 Units Generation へ進行（最後の INCEPTION ステージ）。
 
 ---
+
+## Application Design 微修正 - Checkin → CheckIn 表記統一
+**Timestamp**: 2026-05-09T03:45:00Z
+**User Input**: "Checkin → CheckIn にして欲しい"
+**AI Response**: Application Design 配下の5ファイルすべてで表記統一を実施。
+- PascalCase 識別子: `Checkin` → `CheckIn`（型: CheckInMethod / CheckInEntry、Service: EventCheckIn）
+- camelCase 識別子: `checkin` → `checkIn`（メソッド: checkInEvent / listEventCheckIns、変数: checkInWindowStart/End / checkInMethod、フィールド: checkIns、hook: useCheckInMutation）
+- URL パス: `/checkin` → `/check-in`（REST kebab-case 慣習）
+- DynamoDB SK 定数: `#CHECKIN#` → `#CHECK_IN#`（SCREAMING_SNAKE_CASE 統一）
+- DynamoDB エンティティ表現: `(Checkin)` → `(CheckIn)`
+他のドキュメント（requirements.md, stories.md, personas.md, execution-plan.md）は日本語の「チェックイン」のみで該当英表記なし、変更不要。
+
+---

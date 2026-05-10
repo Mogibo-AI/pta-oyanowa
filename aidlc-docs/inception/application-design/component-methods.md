@@ -21,7 +21,7 @@ type PostCategory = "SAFETY" | "EVENT" | "CONTACT" | "REQUEST" | "OTHER";
 type PostStatus = "PENDING" | "IN_PROGRESS" | "RESOLVED";
 type EventStatus = "PROPOSED" | "VOTING" | "CANDIDATE" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
 type VoteOption = "AGREE" | "DISAGREE" | "NEUTRAL";
-type CheckinMethod = "QR" | "TAP";
+type CheckInMethod = "QR" | "TAP";
 type NextAction = "EVENT_PLAN" | "URGENT_TOPIC" | "NO_ACTION";
 type Locale = "ja" | "en";
 
@@ -201,22 +201,22 @@ voteEventProposal(ctx: AuthContext, proposalId: EventProposalId, input: { vote: 
 // POST /events/:id/confirm （管理者のみ）
 confirmEvent(ctx: AuthContext, eventId: string, input: {
   scheduledAt: string,
-  checkinWindowStart: string,
-  checkinWindowEnd: string,
-  checkinMethod: CheckinMethod  // B-7 X: 管理者選択、デフォルト QR
+  checkInWindowStart: string,
+  checkInWindowEnd: string,
+  checkInMethod: CheckInMethod  // B-7 X: 管理者選択、デフォルト QR
 })
   : Promise<{ event: Event, qrToken?: string }>
 // 副作用: イベントステータス CANDIDATE → CONFIRMED、Stream Processor 経由で全保護者に通知（B-8 C）
 
-// POST /events/:id/checkin
-checkinEvent(ctx: AuthContext, eventId: string, input: { qrToken?: string })
+// POST /events/:id/check-in
+checkInEvent(ctx: AuthContext, eventId: string, input: { qrToken?: string })
   : Promise<{ checkedInAt: string }>
 // 認可: 受付期間内、重複防止
 // QR モードの場合: qrToken の有効性検証（時刻署名）
 
-// GET /events/:id/checkins （管理者のみ）
-listEventCheckins(ctx: AuthContext, eventId: string)
-  : Promise<{ totalCount: number, items: CheckinEntry[] }>
+// GET /events/:id/check-ins （管理者のみ）
+listEventCheckIns(ctx: AuthContext, eventId: string)
+  : Promise<{ totalCount: number, items: CheckInEntry[] }>
 ```
 
 ---
@@ -341,7 +341,7 @@ generateMonthlyReport(input: {
     surveysDelivered: number,
     surveyAvgResponseRate: number,
     eventsConfirmed: EventSummary[],
-    checkins: { eventId: string, attendeeCount: number }[]
+    checkIns: { eventId: string, attendeeCount: number }[]
   },
   budgetData: BudgetSnapshot  // MVP では暫定構造
 })
@@ -436,7 +436,7 @@ export function useSubmitAnswers();
 
 export function useEventProposals();
 export function useVoteMutation();
-export function useCheckinMutation();
+export function useCheckInMutation();
 
 export function useReports();
 

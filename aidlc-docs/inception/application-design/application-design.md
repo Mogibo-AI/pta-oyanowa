@@ -219,7 +219,7 @@ requirements.md §13 の受け入れ基準と本設計の対応:
 | PBT 適用ルール（02/03/07/08/09）満足 | components.md §10 PBT マッピングで紐付け |
 | AIエージェント分離（オーケストレーター + 6サブエージェント）| C-AI-ORCH + C-AI-SUB-* 6体 + C-AI-MONTHLY |
 | 毎日9時 EventBridge → 配信判断 → アンケート配信 → 結果分析 → イベント企画 のチェーン | services.md §2 DailyScheduler State Machine |
-| イベント企画案 → 賛否投票 → 実施候補 → 実施確定 → チェックイン → 参加状況確認 | services.md §6 EventCheckin Service + §5 EventConfirmation Service |
+| イベント企画案 → 賛否投票 → 実施候補 → 実施確定 → チェックイン → 参加状況確認 | services.md §6 EventCheckIn Service + §5 EventConfirmation Service |
 | プロンプトのゴールデンテストが CI で実行 | C-AI-LIB の `golden-tests/` + AI-PROMPT-02 |
 | CloudWatch Dashboard で主要メトリクス可視化 | C-INFRA: MonitoringStack |
 | Slack アラート発火確認 | C-INFRA: MonitoringStack + Slack Webhook |

@@ -116,7 +116,7 @@
 | 配置 | `backend/functions/event/` |
 | 関連要件 | F-08.1〜7（企画案・投票・実施候補マーク）、F-10.1〜7（実施確定・チェックイン）|
 | 関連ストーリー | US-F08-001〜003 / US-F10-001/002 |
-| API 担当範囲 | `GET /events/proposals` / `GET /events/proposals/:id` / `POST /events/proposals/:id/vote` / `POST /events/:id/confirm`（管理者）/ `POST /events/:id/checkin` / `GET /events/:id/checkins`（管理者）|
+| API 担当範囲 | `GET /events/proposals` / `GET /events/proposals/:id` / `POST /events/proposals/:id/vote` / `POST /events/:id/confirm`（管理者）/ `POST /events/:id/check-in` / `GET /events/:id/check-ins`（管理者）|
 | 主要責務 | 企画案 CRUD、投票管理、実施候補判定（賛成≥反対+興味なし & 投票率≥20%）、チェックイン処理（QRトークン or タップ）、参加者集計 |
 | AI連携 | 企画案生成は Step Functions チェーン（Daily Scheduler の③）から起動 |
 
