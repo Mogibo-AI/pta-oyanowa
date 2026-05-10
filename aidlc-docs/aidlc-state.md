@@ -5,7 +5,7 @@
 - **Project Type**: Greenfield
 - **Start Date**: 2026-05-09T00:00:00Z
 - **Current Phase**: INCEPTION
-- **Current Stage**: User Stories (完了 / 承認待ち) → Workflow Planning (次)
+- **Current Stage**: Workflow Planning (完了 / 承認待ち) → Application Design (次)
 
 ## Workspace State
 - **Existing Code**: No
@@ -36,14 +36,19 @@
 - [x] Workspace Detection — Greenfield 確定（2026-05-09）
 - [ ] Reverse Engineering — SKIP（Greenfield のため）
 - [x] Requirements Analysis — 完了・承認済み（2026-05-09、追加要望3件反映済）
-- [x] User Stories — 完了（2026-05-09、5ペルソナ + 29ストーリー、ユーザー承認待ち）
-- [ ] Workflow Planning — TBD
-- [ ] Application Design — TBD（推奨: 実施）
-- [ ] Units Generation — TBD（推奨: 実施）
+- [x] User Stories — 完了・承認済み（2026-05-09、5ペルソナ + 31ストーリー、F-10 反映済）
+- [x] Workflow Planning — 完了（2026-05-09、ユーザー承認待ち）
+- [ ] Application Design — EXECUTE 判定（次ステージ）
+- [ ] Units Generation — EXECUTE 判定（Application Design 後）
 
 ### CONSTRUCTION PHASE
-- [ ] Per-Unit Loop — TBD
-- [ ] Build and Test — TBD
+- [ ] Per-Unit Loop — EXECUTE 判定:
+  - [ ] Functional Design (per-unit) — EXECUTE（大半のユニット）
+  - [ ] NFR Requirements (per-unit) — EXECUTE
+  - [ ] NFR Design (per-unit) — EXECUTE
+  - [ ] Infrastructure Design (per-unit) — EXECUTE
+  - [ ] Code Generation (per-unit) — EXECUTE (ALWAYS)
+- [ ] Build and Test — EXECUTE (ALWAYS)
 
 ### OPERATIONS PHASE
 - [ ] Operations — Placeholder

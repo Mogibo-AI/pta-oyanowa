@@ -102,3 +102,24 @@
 **Context**: MVP の F-08 検証目的（AI 企画の実用性検証）に対し F-10 の参加実績データが補完となる設計。
 
 ---
+
+## User Stories - 承認 / Workflow Planning 完了
+**Timestamp**: 2026-05-09T02:45:00Z
+**User Input**: "Approve & Continue"
+**AI Response**: User Stories ステージを承認済みとマーク（Stage Progress 更新）。Workflow Planning ステージ実行。`aidlc-docs/inception/plans/execution-plan.md` を生成（9セクション: 詳細分析サマリー・ワークフロー可視化Mermaid・実行フェーズ判定・想定Units・タイムライン・成功基準・リスク緩和策・OQ解決マッピング・次ステージ）。
+**判定**: INCEPTION 残: Application Design EXECUTE / Units Generation EXECUTE。CONSTRUCTION: 全ステージ EXECUTE（Functional/NFR Req/NFR Design/Infra Design/Code Gen/Build & Test）、per-unit ループ。OPERATIONS: PLACEHOLDER。想定Units数: 14（フロントエンド2 + バックエンド8 + 共有3 + インフラ1）。Risk Level: High。OQ-15件中9件をApplication Designで解決予定。
+**Context**: ⛔ GATE: Workflow Planning のユーザー承認待ち。承認後 Application Design へ進行。
+
+---
+
+## Workflow Planning 段階 - 追加要望5（プラットフォーム制約）反映
+**Timestamp**: 2026-05-09T03:00:00Z
+**User Input**: "iPhone のアプリリリースはMVPでは視野に入れず、Androidのみをゴールとしたいです。.apkの作成までのフォローをお願いします。（RNなので、iPhoneも動くはずですが、リリースはGooglePlayだけを目指します）phase2でWeb作成、 phase3でiOSのリリースをする予定です。"
+**AI Response**: 追加要望5 を反映。
+**requirements.md 更新**: ①F-11 Android アプリ配信（.apk ビルド）を §4.1 MVP IN に追加・§5 機能要件に F-11.1〜F-11.6 を追加（minSdkVersion API 23 / dev用apk CodeBuild自動ビルド / リリースビルド手順README化 / iOS は基本構成のみ Phase 3 活性化 / Google Play メタデータ準備 / iPhone 保護者への暫定アナウンス）/ ②§4.2 既存「Web保護者向け」を Phase 2 として補強・「iOS App Store リリース」を Phase 3 として新規追加 / ③§8.2 React Native に Expo (EAS Build) 追加・モバイル対象プラットフォーム明示 / ④§10.1 制約事項に「MVP プラットフォーム制約: Android のみリリース」追記 / ⑤OQ-17（Expo採用判断）/ OQ-18（Google Play 開発者アカウント）/ OQ-19（IAP将来必要性）追加 / ⑥受け入れ基準・トレーサビリティ更新。
+**personas.md 更新**: P-01 田中ゆかりとP-02 山本健太の主要デバイスを Android に変更（MVP検証可能性のため）、P-03/P-04 はWeb管理者なのでデバイスは「OS問わず」と明示、冒頭に「MVP プラットフォーム制約」のboxを追記。
+**stories.md 更新**: US-F11-001 を追加（合計31本→32本）、目次・カバレッジ表・INVEST表・ペルソナマッピング更新。
+**execution-plan.md 更新**: 開発スコープ概要にプラットフォーム明示、想定 Units U-FE-PARENT に Expo+EAS Build / Android専用注釈追加、Key Deliverables に「.apk自動ビルド」「Google Play メタデータ」追加、リスク表に「iPhone 保護者の MVP 不参加」「Expo+Bedrock互換性」「Google Play アカウント遅延」追加。
+**Context**: ⛔ GATE: Workflow Planning 再承認待ち。承認後 Application Design へ進行。
+
+---
