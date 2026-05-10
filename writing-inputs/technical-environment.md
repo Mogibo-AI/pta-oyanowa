@@ -9,16 +9,17 @@
 
 ### 必須
 
-| 言語 | バージョン | 用途 |
-|-----|-----------|------|
-| TypeScript | 5.x 以上 | フロントエンド・バックエンド全般 |
-| Node.js | 20.x LTS 以上 | バックエンドランタイム |
+| 言語 | バージョン | 用途 | 備考 |
+|-----|-----------|------|------|
+| TypeScript | 6.0.x（最新stable） | フロントエンド・バックエンド全般 | 7.0はBetaのため不採用 |
+| Node.js | 22.x LTS | バックエンドランタイム（AWS Lambda） | Node.js 20.x は 2026-04-30 にEOL済みのため不可。24.x も Lambda 対応済みだが、安定運用優先で 22.x LTS を採用 |
 
 ### 任意（状況次第で使用）
 
 | 言語 | バージョン | 用途 | 条件 |
 |-----|-----------|------|------|
 | Python | 3.12以上 | Bedrock連携の一部・データ変換バッチ | TypeScriptで対応困難な場合のみ |
+| Kotlin | 最新stable | React Native のAndroidネイティブモジュール拡張時に限定使用 | Android固有のネイティブ機能が必要になった場合のみ |
 
 ### 禁止
 
@@ -26,6 +27,8 @@
 |-----|------|
 | PHP | 採用スタックに不一致 |
 | Ruby | 採用スタックに不一致 |
+| Java | 採用スタックに不一致（Kotlin が React Native 拡張用途で許可されているため不要） |
+| Go | 採用スタックに不一致 |
 
 ---
 
@@ -35,35 +38,38 @@
 
 | 種別 | ライブラリ/FW | バージョン | 用途 | 備考 |
 |-----|-------------|-----------|------|------|
-| Web（管理者画面・保護者向け） | React | 18.x以上 | UIコンポーネント | |
-| Web フレームワーク | Next.js | 14.x以上（App Router） | SSR・ルーティング | |
-| アプリ（iOS/Android） | React Native | 0.74以上 | 保護者向けアプリ | Expo使用を検討 |
+| Web（管理者画面） | React | 19.2.x（最新stable） | UIコンポーネント（MVP対象） | |
+| Web（保護者向け） | React | 19.2.x（最新stable） | UIコンポーネント（Phase 2 で提供） | |
+| Web フレームワーク | Next.js | 16.x（最新stable / App Router） | SSR・ルーティング | 15.x はLTSが2026-10で終了のため新規採用は16.x |
+| アプリ（iOS/Android） | React Native | 0.85.x（最新stable） | 保護者向けアプリ | Expo使用を検討 / Androidネイティブ拡張時はKotlin可 |
 | UIコンポーネントライブラリ | TBD (shadcn/ui or MUI) | TBD | 共通UIコンポーネント | 選定中 |
-| 状態管理 | Zustand | 最新版 | グローバル状態管理 | Reduxは不要な複雑さのため不採用 |
-| HTTPクライアント | Axios or fetch（標準） | — | API通信 | — |
-| グラフ | Recharts | 最新版 | アンケート結果・会費グラフ | — |
+| 状態管理 | **TBD（Zustand 5.0.x or Jotai 2.20.x）** | TBD | グローバル状態管理 | 後ほど決定。Reduxは不要な複雑さのため不採用 |
+| HTTPクライアント | superagent | 10.3.x（最新stable） | API通信 | Axiosは不採用 |
+| グラフ | Recharts | 3.8.x（最新stable） | アンケート結果・会費グラフ | — |
 | カレンダー | TBD (react-big-calendar or fullcalendar) | TBD | 機能7 カレンダー表示 | 選定中 |
 
 ### バックエンド（必須）
 
 | ライブラリ/FW | バージョン | 用途 | 備考 |
 |-------------|-----------|------|------|
-| Express または Fastify | 最新安定版 | REST API サーバー | Hono は使用しない（後述） |
-| Zod | 最新版 | 入力バリデーション・スキーマ定義 | — |
-| AWS SDK v3 (@aws-sdk/*) | v3.x以上 | 全AWSサービスとの通信 | モジュラー設計で必要なサービスのみimport |
-| @anthropic-ai/sdk | 最新版 | Bedrock経由でのClaude呼び出し | Bedrock対応版を使用 |
-| jsonwebtoken | 最新版 | JWT検証（Cognitoトークン） | — |
+| Express | 5.2.x（最新stable） | REST API サーバー | Fastify・Honoは使用しない |
+| Zod | 4.4.x（最新stable） | 入力バリデーション・スキーマ定義 | — |
+| AWS SDK v3 (@aws-sdk/*) | 3.x（モジュラー / 最新stable） | 全AWSサービスとの通信 | 必要なサービスのみimport（例：`@aws-sdk/client-dynamodb` の最新は 3.10xx 系） |
+| @anthropic-ai/sdk | 0.95.x（最新stable） | Bedrock経由でのClaude呼び出し | Bedrock対応版を使用（`@anthropic-ai/bedrock-sdk` も検討） |
+| jsonwebtoken | 9.0.x（最新stable） | JWT検証（Cognitoトークン） | — |
 
 ### 禁止ライブラリ・フレームワーク
 
 | 禁止 | 理由 | 代わりに使うもの |
 |-----|------|----------------|
-| **Hono** | バックエンドとして採用しない（ユーザー指示） | Express または Fastify |
+| **Hono** | バックエンドとして採用しない（ユーザー指示） | Express |
+| **Fastify** | Express に統一する（ユーザー指示） | Express |
+| **Axios** | superagent に統一する（ユーザー指示） | superagent |
 | **Supabase** | AWSに統一するため。PostgreSQLはAurora、認証はCognito | Amazon Aurora / Amazon Cognito |
-| **Firebase** | AWSに統一するため。プッシュ通知はSNS+FCM（FCMはAPN経由のみ） | Amazon SNS + APNs/FCM |
+| **Firebase** | AWSに統一するため。プッシュ通知は Amazon SNS 経由で FCM(Android)/APNs(iOS) を利用 | Amazon SNS + FCM(Android)/APNs(iOS) |
 | **Prisma（RDB ORM）** | DynamoDBが主DBのため不要。Auroraが必要になった場合のみ検討 | DynamoDB DocumentClient / Aurora: knex or raw SQL |
-| **Redux** | このアプリの規模に対して複雑すぎる | Zustand |
-| **moment.js** | メンテナンス終了・バンドルサイズが大きい | date-fns または Day.js |
+| **Redux** | このアプリの規模に対して複雑すぎる | Zustand or Jotai（TBD） |
+| **moment.js** | メンテナンス終了・バンドルサイズが大きい | date-fns（4.1.x）または Day.js |
 
 ---
 
@@ -73,7 +79,7 @@
 
 | サービス | 用途 | 備考 |
 |---------|------|------|
-| **Amazon Bedrock** | Claude呼び出し（AI機能全般） | claude-sonnet-4-6（高精度）、claude-haiku-4-5（コスト重視）を使い分け |
+| **Amazon Bedrock** | Claude呼び出し（AI機能全般） | `anthropic.claude-sonnet-4-6`（高精度）、`anthropic.claude-haiku-4-5-20251001`（コスト重視）を使い分け |
 | **AWS Lambda** | バックエンドAPI・バッチ処理 | Node.js 20.x ランタイム |
 | **Amazon API Gateway** | REST APIのエンドポイント管理 | Lambda統合 |
 | **Amazon DynamoDB** | 主DB（学校ごとにテーブル分離） | オンデマンドキャパシティ推奨 |
@@ -138,7 +144,7 @@
 oyano-wa/
 ├── apps/
 │   ├── web-admin/         # Next.js: 管理者Webアプリ
-│   ├── web-parent/        # Next.js: 保護者WebアプリKei（Phase 2）
+│   ├── web-parent/        # Next.js: 保護者Webアプリ（Phase 2）
 │   └── app-parent/        # React Native: 保護者モバイルアプリ
 ├── packages/
 │   ├── api-client/        # 共通APIクライアント（型定義含む）
@@ -182,7 +188,8 @@ oyano-wa/
 
 ### シークレット管理
 
-- **ハードコード禁止**（Bedrock APIキー・DB接続情報・外部サービスキーなど）
+- **ハードコード禁止**（DB接続情報・外部サービスのAPIキー・トークンなど）
+- Bedrock は IAM ロールで認証する（APIキーは使わない）
 - すべてのシークレットは AWS Secrets Manager に格納
 - Lambda関数は起動時にSecrets Managerから取得（キャッシュを活用し呼び出し回数を削減）
 
@@ -215,8 +222,8 @@ oyano-wa/
 ### CI/CDゲート
 
 
-- PR作成時: 単体テスト・Lintが必須（通らなければマージ不可）
-- mainブランチへのマージ時: E2Eテストも必須
+- すべてのPR作成・更新時: 単体テスト・Lintが必須（通らなければマージ不可）
+- mainブランチへのPR時: E2Eテストも必須（通らなければマージ不可）
 - デプロイ前: CDKのdiff確認・セキュリティスキャン（npm audit）
 
 
