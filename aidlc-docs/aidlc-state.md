@@ -4,8 +4,8 @@
 - **Project Name**: 全自動PTA - おやのわ (oyano-wa)
 - **Project Type**: Greenfield
 - **Start Date**: 2026-05-09T00:00:00Z
-- **Current Phase**: INCEPTION (完了予定) → CONSTRUCTION (次)
-- **Current Stage**: Units Generation (完了 / 承認待ち) → CONSTRUCTION フェーズ (per-unit ループ)
+- **Current Phase**: INCEPTION (**完了** 2026-05-09) → CONSTRUCTION (次回開始)
+- **Current Stage**: INCEPTION フェーズ全ステージ承認済み。CONSTRUCTION フェーズは次回セッションで開始予定
 
 ## Workspace State
 - **Existing Code**: No
@@ -39,7 +39,7 @@
 - [x] User Stories — 完了・承認済み（2026-05-09、5ペルソナ + 31ストーリー、F-10 反映済）
 - [x] Workflow Planning — 完了・承認済み（2026-05-09、F-11 反映済）
 - [x] Application Design — 完了・承認済み（2026-05-09、26コンポーネント・5設計ドキュメント、Checkin→CheckIn 表記統一済）
-- [x] Units Generation — 完了（2026-05-09、14ユニット・3ドキュメント、ユーザー承認待ち）
+- [x] Units Generation — **完了・承認済み**（2026-05-09、15ユニット・3ドキュメント、追加要望6でローカル開発設計補強済 + U-LOCAL 新設）
 
 ### CONSTRUCTION PHASE
 - [ ] Per-Unit Loop — EXECUTE 判定:
