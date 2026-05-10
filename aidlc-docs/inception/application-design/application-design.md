@@ -203,8 +203,9 @@ oyano-wa/
 | **U-AI-ORCHESTRATION** | Step Functions + EventBridge | C-AI-ORCH + C-AI-MONTHLY | 0（基盤）|
 | **U-SHARED** | 共通パッケージ | C-PKG-* 5つ | 1（F-07）|
 | **U-INFRA** | CDK スタック群 | C-INFRA | 0（基盤、F-11含む）|
+| **U-LOCAL** | ローカル開発環境（追加要望6）| C-INFRA-LOCAL + C-LOCAL-SERVER | 0（基盤、全ストーリー検証用）|
 
-→ **想定14ユニット** （Workflow Planning と一致）
+→ **確定15ユニット**（U-LOCAL を追加要望6 で新設）
 
 ---
 
@@ -294,6 +295,22 @@ requirements.md §13 の受け入れ基準と本設計の対応:
 - 学校アクティブ確認などカスタムロジックを 1 箇所に集約
 - 5分キャッシュでコスト・レイテンシの影響を最小化
 - 将来のレート制限・追加検証拡張が容易
+
+---
+
+### 追加要望6（ローカル開発設計）の反映
+
+ローカル開発を「設計上の第一級市民」として扱うため、以下を全ドキュメントに反映:
+
+- **components.md**: C-AI-LIB の `BedrockClient` を interface 化、`RealBedrockClient` / `MockBedrockClient` / `bedrock-client-factory.ts` の3実装に分離。新規コンポーネント C-INFRA-LOCAL（docker-compose + 起動スクリプト群）と C-LOCAL-SERVER（Express 統合サーバ）を追加。
+- **component-methods.md**: 環境変数 `RUNTIME` による Factory パターンの interface・型定義を追加。docker-compose 構成と local-orchestrator の関数シグネチャ追加。
+- **services.md**: 新規 §9.5 LocalDevelopment Service を追加。npm scripts 一覧、構成図、環境変数による実装切替、MockBedrockClient の応答戦略を明示。
+- **component-dependency.md**: 新規 §7.5 ローカル開発の依存切替を追加。RUNTIME=local|dev|prod での依存ターゲット切替表。
+- **unit-of-work.md**: 新規ユニット **U-LOCAL** を追加（15ユニット目）。Phase 1 で早期着手推奨。
+- **unit-of-work-dependency.md**: U-LOCAL の依存関係セクション追加（オフ Critical Path）。
+- **requirements.md §9.1**: ローカル開発環境の詳細設計を追加。
+
+これにより、AI 主導の Code Generation で各ユニット実装時に **ローカル動作対応が一貫したパターンで生成**されます。
 
 ---
 

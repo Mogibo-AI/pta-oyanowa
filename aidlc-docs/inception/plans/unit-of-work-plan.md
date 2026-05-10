@@ -153,35 +153,35 @@ X) Other（自由記述）
 セクション A・B・C の質問にすべて回答後、Part 2 で以下のステップを実行します。
 
 ### Phase D-1: ユニット分解の確定
-- [ ] D-1.1 質問 A-1〜A-4 の回答に基づき、最終ユニット数を確定
-- [ ] D-1.2 各ユニットの境界・責任・関連コンポーネントを定義
-- [ ] D-1.3 デプロイ単位・所有権境界を明示
-- [ ] D-1.4 `aidlc-docs/inception/application-design/unit-of-work.md` を生成
-- [ ] D-1.5 グリーンフィールドのコード組織戦略を `unit-of-work.md` に含める（モノレポ構造）
+- [x] D-1.1 質問 A-1〜A-4 の回答に基づき、最終ユニット数を確定
+- [x] D-1.2 各ユニットの境界・責任・関連コンポーネントを定義
+- [x] D-1.3 デプロイ単位・所有権境界を明示
+- [x] D-1.4 `aidlc-docs/inception/application-design/unit-of-work.md` を生成
+- [x] D-1.5 グリーンフィールドのコード組織戦略を `unit-of-work.md` に含める（モノレポ構造）
 
 ### Phase D-2: 依存関係の整理
-- [ ] D-2.1 質問 A-5 を反映してユニット間依存マトリクスを作成
-- [ ] D-2.2 ユニットの開発順序・並列開発可能性を判定
-- [ ] D-2.3 Critical Path を特定（ブロッキングユニット）
-- [ ] D-2.4 `aidlc-docs/inception/application-design/unit-of-work-dependency.md` を生成
+- [x] D-2.1 質問 A-5 を反映してユニット間依存マトリクスを作成
+- [x] D-2.2 ユニットの開発順序・並列開発可能性を判定
+- [x] D-2.3 Critical Path を特定（ブロッキングユニット）
+- [x] D-2.4 `aidlc-docs/inception/application-design/unit-of-work-dependency.md` を生成
 
 ### Phase D-3: ストーリーマッピング
-- [ ] D-3.1 全32ストーリーを各ユニットに割り当て（質問B-1, B-2 反映）
-- [ ] D-3.2 各ユニットの担当ストーリー一覧を生成
-- [ ] D-3.3 主所属・副所属の区別を明示
-- [ ] D-3.4 `aidlc-docs/inception/application-design/unit-of-work-story-map.md` を生成
+- [x] D-3.1 全32ストーリーを各ユニットに割り当て（質問B-1, B-2 反映）
+- [x] D-3.2 各ユニットの担当ストーリー一覧を生成
+- [x] D-3.3 主所属・副所属の区別を明示
+- [x] D-3.4 `aidlc-docs/inception/application-design/unit-of-work-story-map.md` を生成
 
 ### Phase D-4: 検証
-- [ ] D-4.1 全32ストーリーがどこかのユニットに所属しているか確認
-- [ ] D-4.2 全機能要件 F-01〜F-11 がユニットでカバーされているか確認
-- [ ] D-4.3 SECURITY 拡張ルール 15個のユニット担当が明確か確認
-- [ ] D-4.4 PBT 適用ルール 5個のユニット担当が明確か確認
-- [ ] D-4.5 audit.md 更新
-- [ ] D-4.6 aidlc-state.md 更新
+- [x] D-4.1 全32ストーリーがどこかのユニットに所属しているか確認
+- [x] D-4.2 全機能要件 F-01〜F-11 がユニットでカバーされているか確認
+- [x] D-4.3 SECURITY 拡張ルール 15個のユニット担当が明確か確認
+- [x] D-4.4 PBT 適用ルール 5個のユニット担当が明確か確認
+- [x] D-4.5 audit.md 更新
+- [x] D-4.6 aidlc-state.md 更新
 
 ### Phase D-5: 完了報告
-- [ ] D-5.1 ユーザー向け完了メッセージ準備
-- [ ] D-5.2 承認待ち状態に遷移
+- [x] D-5.1 ユーザー向け完了メッセージ準備
+- [x] D-5.2 承認待ち状態に遷移
 
 ---
 

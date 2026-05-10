@@ -488,6 +488,50 @@ GitHub Actions が AWS CodePipeline を Webhook 起動する構成。
 | **MVP環境** | **dev のみ**（質問9 C）。本番化のタイミングは Phase 2 着手時に再検討 |
 | ローカル開発 | DynamoDB Local + LocalStack（一部） + Bedrock はモック/スタブ（質問19 A） |
 
+### 9.1 ローカル開発環境の詳細設計（追加要望6）
+
+**目的**: MVPリリース前にローカルで全機能の動作確認を可能にする。AWSデプロイ不要・コスト発生なし。
+
+#### サービスごとのローカル戦略
+
+| サービス | 戦略 | 詳細 |
+|---|---|---|
+| **Bedrock** | **モック実装必須**（コード分離）| `MockBedrockClient` 実装、決定的レスポンス or プリセット応答 |
+| DynamoDB | DynamoDB Local（Docker）| 公式ローカル版、コード変更不要（endpoint 指定のみ）|
+| S3 | LocalStack S3 | LocalStack 標準対応 |
+| Cognito | cognito-local（OSS）+ fake JWT 発行ツール | LocalStack の Cognito は機能限定的 |
+| SNS / SQS | LocalStack | LocalStack 標準対応 |
+| EventBridge | npm script + 手動 invoke | MVP は手動トリガーで十分 |
+| Step Functions | 手動 Lambda チェーン（local-orchestrator スクリプト）| Lambda 直接呼び出しの方がデバッグ容易 |
+| API Gateway + Lambda | **Express を直接起動**（Lambda Adapter 不使用）| Express on Lambda の利点を活かしてポート3001 で素の Express として起動 |
+| Web (Admin) | Next.js dev server（`pnpm dev`）| 標準 |
+| Mobile (Parent) | Expo dev (`pnpm start` + Expo Go アプリ) | 標準、API endpoint をローカルに向ける |
+
+#### 起動フロー（開発者の体験）
+
+```bash
+pnpm local:up           # docker-compose 起動（DynamoDB Local + LocalStack + cognito-local）
+                        # + テーブル初期化 + シードデータ投入
+                        # + Express ローカルサーバ起動（ポート3001）
+
+pnpm local:web          # 別ターミナル: 管理者画面 (ポート3000)
+pnpm local:mobile       # 別ターミナル: Expo Mobile (ポート19000等)
+
+# 必要に応じて手動トリガー
+pnpm local:trigger-daily    # 毎日9時の AI チェーンを手動発火
+pnpm local:trigger-monthly  # 月初レポート生成を手動発火
+
+pnpm local:down         # 全停止
+```
+
+#### 環境切替戦略
+
+環境変数 `RUNTIME=local | dev | prod` で実装を自動切替:
+- `local` → MockBedrockClient + DynamoDB Local + cognito-local + LocalStack エンドポイント
+- `dev` / `prod` → 本物のAWSサービス利用
+
+詳細な実装パターン・モノレポ構造への反映は Application Design 成果物（components.md / unit-of-work.md / services.md）を参照。
+
 ---
 
 ## 10. 制約事項
@@ -605,6 +649,7 @@ MVPリリース可能と判断する基準:
 | **追加要望5 (MVP)**: Android のみリリース・.apk 配布 | F-11、§4.1 MVP IN追加、§8.2 Expo+EAS Build 採用、§10.1 制約追加、§13 受け入れ基準、OQ-17, 18, 19 |
 | **追加要望5 (Phase 2)**: Web 版で iPhone/PC ユーザーをサポート | §4.2 Phase 2（既存「Web保護者向け」を補強） |
 | **追加要望5 (Phase 3)**: iOS App Store リリース | §4.2 Phase 3（新規追加） |
+| **追加要望6**: ローカル開発環境の設計詳細化 | §9.1 ローカル開発設計、Application Design 各種ドキュメントに反映 |
 
 ---
 

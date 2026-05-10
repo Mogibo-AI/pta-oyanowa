@@ -17,7 +17,8 @@
 | Stream Processor | 2 | backend/functions/streams/ |
 | Shared Packages | 5 | packages/ |
 | Infrastructure | 1（複数 CDK スタックを内包）| infra/cdk/ |
-| **合計** | **26 コンポーネント** | |
+| **Local Development（追加要望6）** | **2**（C-INFRA-LOCAL + C-LOCAL-SERVER）| `infra/local/` + `backend/local-server/` |
+| **合計** | **28 コンポーネント** | |
 
 ---
 
@@ -203,8 +204,9 @@
 | 項目 | 値 |
 |---|---|
 | 配置 | `backend/lib/ai/` |
-| 役割 | Bedrock SDK ラッパー、Guardrails 適用、リトライ処理、共通プロンプト管理ディレクトリ、ゴールデンテストインフラ |
-| サブモジュール | `prompts/`（プロンプトファイル群）、`golden-tests/`（CIで実行）、`guardrails-config.ts` |
+| 役割 | Bedrock SDK ラッパー、Guardrails 適用、リトライ処理、共通プロンプト管理ディレクトリ、ゴールデンテストインフラ、**ローカル開発用モック実装** |
+| サブモジュール | `bedrock-client.ts`（**interface 定義**）、`bedrock-client-real.ts`（本番AWS SDK実装）、`bedrock-client-mock.ts`（**ローカル/テスト用モック実装**）、`bedrock-client-factory.ts`（環境変数 `RUNTIME` で実装切替）、`prompts/`（プロンプトファイル群）、`golden-tests/`（CIで実行、Mockを再利用）、`guardrails-config.ts` |
+| **ローカル開発対応** | RUNTIME=local の場合 MockBedrockClient を返却。プリセット応答 + 環境変数 `MOCK_DELIVER` 等で動作制御可能 |
 
 ---
 
@@ -264,9 +266,9 @@
 
 ## 8. Infrastructure Component
 
-### C-INFRA: AWS CDK スタック群
-| 配置 | `infra/cdk/` |
-| 技術 | AWS CDK v2 (TypeScript) |
+### C-INFRA: AWS CDK スタック群 + ローカル開発インフラ
+| 配置 | `infra/cdk/`（AWSデプロイ用）+ **`infra/local/`（ローカル開発用、追加要望6）**|
+| 技術 | AWS CDK v2 (TypeScript)、Docker Compose、tsx |
 | 構成 | 以下のスタックに分離 |
 
 | Stack | 内容 |
@@ -281,6 +283,25 @@
 | `SecretsStack` | KMS Key + Secrets Manager（DB接続情報・APIキーは原則使わない、Bedrock は IAM Role認証）|
 | `FrontendStack` | CloudFront + S3（admin web 配信）+ Route 53（将来）|
 | `MobileBuildStack` | EAS Build 連携用 IAM ロール（OIDC） + S3 アーティファクト保存 |
+
+#### C-INFRA-LOCAL: ローカル開発インフラ（追加要望6 で追加）
+
+| 項目 | 値 |
+|---|---|
+| 配置 | `infra/local/` |
+| 構成ファイル | `docker-compose.yml`（DynamoDB Local + LocalStack + cognito-local）、`init-tables.ts`（DynamoDB Local 初期テーブル作成）、`seed-data.ts`（サンプルデータ投入）、`trigger-daily-scheduler.ts`（EventBridge 代替: 手動 9時トリガー）、`trigger-monthly-report.ts`（EventBridge 代替: 手動月初トリガー） |
+| 連携 | `backend/local-server/`（**新規追加 C-LOCAL-SERVER**）が Express で全 Lambda を統合実行 |
+| 環境変数 | `RUNTIME=local`、`AWS_ENDPOINT_URL=http://localhost:4566`（LocalStack）、`DYNAMODB_ENDPOINT=http://localhost:8000`、`COGNITO_ENDPOINT=http://localhost:9229` |
+
+#### C-LOCAL-SERVER: ローカル開発統合 Express サーバ（追加要望6 で追加）
+
+| 項目 | 値 |
+|---|---|
+| 配置 | `backend/local-server/` |
+| 役割 | 全 Backend Service Lambda（Express on Lambda として実装済み）を1つの Express サーバとして統合起動。ポート 3001 で動作 |
+| ルーティング | `/auth/*`, `/posts/*`, `/surveys/*`, `/notifications/*`, `/reports/*`, `/admin/*`, `/events/*` を各 Lambda の Express ルータをマウント |
+| 認証 | cognito-local 発行の fake JWT または Lambda Authorizer をミドルウェア化して使用 |
+| 副作用 | DynamoDB Local / LocalStack の起動済みエンドポイントを使用（環境変数で切替）|
 
 ---
 

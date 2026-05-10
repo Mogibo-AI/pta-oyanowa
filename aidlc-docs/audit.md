@@ -166,3 +166,32 @@
 **Context**: ⛔ GATE: Plan 段階のユーザー回答待ち。「ユニット計画承認」を受けるまで成果物生成（unit-of-work.md / unit-of-work-dependency.md / unit-of-work-story-map.md）には進まない。
 
 ---
+
+## Units Generation Plan - ユーザー承認 / Part 2 ユニット成果物生成完了
+**Timestamp**: 2026-05-09T04:15:00Z
+**User Input**: "ユニット計画承認"（unit-of-work-plan.md 9問回答完了: A-1=A, A-2=X(折衷案: A+AGENTS内部モジュール分離), A-3=A, A-4=A, A-5=A, A-6=D(AI主導開発・人間レビュー), B-1=A, B-2=A, C-1=なし）
+**AI Response**: 回答分析完了（曖昧性なし）。Part 2 Generation を実行。`aidlc-docs/inception/application-design/` 配下に3つのユニット成果物を生成。
+**unit-of-work.md**: 14ユニット定義（U-FE-ADMIN/U-FE-PARENT/U-BE-AUTH/U-BE-SUGGEST-BOX/U-BE-SURVEY/U-BE-NOTIFICATION/U-BE-REPORT/U-BE-ADMIN/U-BE-EVENT/U-AI-CORE/U-AI-AGENTS/U-AI-ORCHESTRATION/U-SHARED/U-INFRA）+ 折衷案を反映した U-AI-AGENTS の内部モジュール分離強制（6サブエージェント別ディレクトリ + Functional Design 章立て）+ Greenfield モノレポ構造 + AI主導開発（A-6 D）に最適化したコード組織原則 + 受け入れ基準のユニット担当マッピング
+**unit-of-work-dependency.md**: 14×14ユニット依存マトリクス + 7階層 DAG + Mermaid 依存グラフ + 開発順序 6 Phase（基盤→認証→Backend並列→AI→Frontend並列→Infra完成）+ Critical Path 分析 + ストリーム経由疎結合 + ユニット間 API 契約 + 境界違反防止4原則 + CDK スタックデプロイ順序9段階 + AI主導開発適用での全体推定 28〜40 営業日
+**unit-of-work-story-map.md**: 32ストーリー全件マッピング（主所属/副所属/優先度）+ ユニット別担当ストーリー一覧 + Construction 作業ボリューム表 + 100% カバレッジ検証 + ペルソナ別ストーリー分布 + 並列開発時の独立性分析 + 次ステージへの per-unit ループ実行方針
+unit-of-work-plan.md の全 Phase D-* チェックボックスを [x] に更新。aidlc-state.md を Units Generation 完了 + INCEPTION 完了予定に更新。
+**Context**: ⛔ GATE: Units Generation 全体の承認待ち。承認後 INCEPTION フェーズ完了 → CONSTRUCTION フェーズ開始（per-unit ループ × 14ユニット）。
+
+---
+
+## 設計補強 - ローカル開発環境の第一級市民化（追加要望6）
+**Timestamp**: 2026-05-09T04:30:00Z
+**User Input**: "質問です。ローカルで起動することを考慮されていますか？AWSサービスにはデプロイせず、Bedrockはモック化が必要です。MVPリリース前にローカルで起動して色々動作確認するつもりです。ローカルのモック実装などを分離できているか気になっています。" → "A でお願いします。"
+**AI Response**: ローカル開発設計を補強。BedrockClient を interface 化（RealBedrockClient + MockBedrockClient + Factory）、新規ユニット U-LOCAL を新設（15ユニットに増加）、6ドキュメントに反映。
+**requirements.md**: §9.1 ローカル開発環境の詳細設計セクション追加（Bedrock モック必須、他は LocalStack/DynamoDB Local/cognito-local で実プロトコル使用、起動フロー npm scripts、環境変数 RUNTIME による切替）。トレーサビリティに追加要望6 行追加。
+**components.md**: C-AI-LIB の役割にモック実装を明記、新規 C-INFRA-LOCAL（docker-compose + scripts）と C-LOCAL-SERVER（Express 統合サーバ）を追加。コンポーネント数 26→28。
+**component-methods.md**: BedrockClient interface + 3実装ファイル + Factory のシグネチャ追加。infra/local/* の関数シグネチャと docker-compose.yml 構造追加。local-server/* の Express middleware 追加。
+**services.md**: §9.5 LocalDevelopment Service 新規セクション（構成図・環境変数切替・MockBedrockClient 応答戦略）。サービス一覧に LocalDevelopment Service 追加。
+**component-dependency.md**: §7.5 ローカル開発の依存切替（環境変数 RUNTIME による依存ターゲット切替表）+ ストリーム代替 + Cognito ローカル時の認証フロー簡略化。
+**unit-of-work.md**: 新規ユニット U-LOCAL 定義追加（15ユニット目、Phase 1 早期着手推奨）。Critical Path への影響なし（オフPath）。モノレポ構造に infra/local/ + backend/local-server/ 追加。
+**unit-of-work-dependency.md**: §7.6 U-LOCAL の依存関係追加（U-SHARED + U-AI-CORE + Backend Service 全ての Express ルータに依存、デプロイ依存なし）。開発フロー上の利点を明示。
+**unit-of-work-story-map.md**: ユニット総数 14→15、U-LOCAL セクション追加（主所属0本だが全ストーリー検証に利用）。
+**application-design.md**: 14ユニット→15ユニットに変更。追加要望6 セクション新設。
+**Context**: ⛔ GATE: Units Generation 含む全 INCEPTION 成果物の最終承認待ち。承認後 CONSTRUCTION フェーズ開始。
+
+---

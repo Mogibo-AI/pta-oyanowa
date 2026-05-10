@@ -355,22 +355,56 @@ generateMonthlyReport(input: {
 
 ## C-AI-LIB: Bedrock Common Library
 
-```typescript
-// Bedrock 呼び出しラッパー
-export class BedrockClient {
-  constructor(config: { region: string, defaultModel: ModelId, guardrailsId?: string });
+### Interface 分離（追加要望6 反映）
 
-  async invokeModel<T>(input: {
+```typescript
+// backend/lib/ai/bedrock-client.ts
+// Bedrock クライアントの抽象 interface（実装は Real / Mock の2種類）
+export interface BedrockClient {
+  invokeModel<T>(input: {
     modelId: ModelId,
     prompt: string,
     maxTokens: number,
     temperature?: number,
     enforceGuardrails?: boolean  // B-10 A: デフォルト true
   }): Promise<T>;
+}
 
+// backend/lib/ai/bedrock-client-real.ts
+// 本番/dev 環境用: AWS Bedrock SDK 実装
+export class RealBedrockClient implements BedrockClient {
+  constructor(config: { region: string, defaultModel: ModelId, guardrailsId?: string });
+  async invokeModel<T>(input): Promise<T>;
   // SECURITY-15 例外処理 + リトライ
   private withRetry<T>(fn: () => Promise<T>, maxRetries: number): Promise<T>;
 }
+
+// backend/lib/ai/bedrock-client-mock.ts
+// ローカル開発・テスト用: 決定的レスポンス
+export class MockBedrockClient implements BedrockClient {
+  constructor(config?: { responseSet?: 'default' | 'event-plan' | 'urgent-topic' | 'no-action' });
+  async invokeModel<T>(input): Promise<T>;
+  // プロンプト種別を見て適切なプリセット応答を返す
+  // 環境変数 MOCK_DELIVER, MOCK_NEXT_ACTION などで動作制御
+}
+
+// backend/lib/ai/bedrock-client-factory.ts
+// 環境変数 RUNTIME により実装を自動切替
+export function createBedrockClient(config?: BedrockClientConfig): BedrockClient {
+  if (process.env.RUNTIME === 'local' || process.env.NODE_ENV === 'test') {
+    return new MockBedrockClient(/* ... */);
+  }
+  return new RealBedrockClient(/* ... */);
+}
+```
+
+### 各サブエージェントの利用例
+
+```typescript
+// 各サブエージェント Lambda の handler.ts は createBedrockClient() を呼ぶだけ
+import { createBedrockClient } from '@oyano/ai-lib';
+const bedrock = createBedrockClient();
+// 以降は interface に対してプログラミング、実装は環境で自動切替
 
 // プロンプト管理
 export const PROMPTS = {
@@ -471,6 +505,85 @@ export interface TokenStorage {
   clear(): Promise<void>;
 }
 // Web: LocalStorageTokenStorage, RN: SecureStoreTokenStorage
+```
+
+---
+
+---
+
+## C-INFRA-LOCAL: ローカル開発インフラ（追加要望6）
+
+```typescript
+// infra/local/init-tables.ts
+// DynamoDB Local の起動後にテーブル+GSI を作成
+export async function initTables(endpoint: string): Promise<void>;
+
+// infra/local/seed-data.ts
+// 開発用シードデータ投入（学校・管理者・サンプル投稿など）
+export async function seedData(endpoint: string): Promise<void>;
+
+// infra/local/trigger-daily-scheduler.ts
+// EventBridge 9時トリガーの代替: 手動で Step Functions 相当のフローを実行
+export async function triggerDailyScheduler(schoolIds: string[]): Promise<void>;
+
+// infra/local/trigger-monthly-report.ts
+// EventBridge 月初トリガーの代替
+export async function triggerMonthlyReport(month: string, schoolIds: string[]): Promise<void>;
+
+// infra/local/local-orchestrator.ts
+// Step Functions の代わりに Lambda チェーンを順次呼び出し
+export async function runDailySchedulerForSchool(schoolId: string): Promise<void> {
+  // ① Survey Decision → ② Survey Generation → ③ Result Analysis → ④ Event Planning
+  // 実装は Step Functions State Machine と等価のロジックを TypeScript で記述
+}
+```
+
+```yaml
+# infra/local/docker-compose.yml (構造)
+services:
+  dynamodb-local:
+    image: amazon/dynamodb-local:latest
+    ports: ["8000:8000"]
+
+  localstack:
+    image: localstack/localstack:latest
+    ports: ["4566:4566"]
+    environment:
+      SERVICES: s3,sns,sqs,events
+      DEBUG: 1
+
+  cognito-local:
+    image: jagregory/cognito-local:latest
+    ports: ["9229:9229"]
+    volumes: ["./cognito-local-data:/app/.cognito"]
+```
+
+---
+
+## C-LOCAL-SERVER: ローカル統合 Express サーバ（追加要望6）
+
+```typescript
+// backend/local-server/index.ts
+import express from 'express';
+// 各 Lambda の Express ルータをそのままマウント
+import { router as authRouter } from '../functions/auth';
+import { router as suggestBoxRouter } from '../functions/suggest-box';
+import { router as surveyRouter } from '../functions/survey';
+// ... 他のサービス
+
+const app = express();
+app.use(express.json());
+app.use(localAuthMiddleware);  // cognito-local の fake JWT を検証
+app.use('/auth', authRouter);
+app.use('/posts', suggestBoxRouter);
+app.use('/surveys', surveyRouter);
+// ...
+app.listen(3001, () => console.log('Local server on http://localhost:3001'));
+
+// backend/local-server/local-auth-middleware.ts
+// Lambda Authorizer の同等処理を Express middleware で実装
+// JWT 検証 + schoolId 抽出 + req.authContext に設定
+export function localAuthMiddleware(req, res, next): void;
 ```
 
 ---

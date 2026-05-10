@@ -20,6 +20,7 @@
 | **NotificationDispatch Service** | API Gateway / 内部呼び出し | C-BE-NOTIFICATION + SNS | F-03 |
 | **AdminOperationLog Service** | 全管理者破壊操作のラッパー | C-BE-ADMIN + DynamoDB | F-06.5 |
 | **i18n Service** | フロントエンド初期化 | C-PKG-I18N | F-07 |
+| **LocalDevelopment Service**（追加要望6） | npm script | C-INFRA-LOCAL + C-LOCAL-SERVER | 全機能のローカル動作確認 |
 
 ---
 
@@ -318,6 +319,101 @@ F-07: 日本語/英語のバイリンガル UI 提供。
 - UIテキスト: 完全バイリンガル
 - AI生成テキスト: 日本語のみ（明確化3 X 該当）
 - 主対象ユーザー: 外国籍保護者（明確化3 補足 A）
+
+---
+
+## 9.5. LocalDevelopment Service（追加要望6）
+
+### 役割
+ローカル開発時に AWS デプロイ不要で全機能の動作確認を可能にする。Bedrock のみモック化、他は LocalStack / DynamoDB Local / cognito-local で実物プロトコルを使用。
+
+### 構成図
+
+```
+[開発者マシン]
+  │
+  ├─ pnpm local:up
+  │   │
+  │   ├─ docker-compose up -d
+  │   │   ├─ DynamoDB Local (port 8000)
+  │   │   ├─ LocalStack (port 4566): S3, SNS, SQS, EventBridge
+  │   │   └─ cognito-local (port 9229)
+  │   │
+  │   ├─ tsx infra/local/init-tables.ts
+  │   │   └─ DynamoDB Local にテーブル+GSI 作成
+  │   │
+  │   ├─ tsx infra/local/seed-data.ts
+  │   │   └─ サンプル学校・管理者・投稿などを投入
+  │   │
+  │   └─ tsx backend/local-server/index.ts
+  │       └─ Express on Lambda の各サービスを統合起動 (port 3001)
+  │           ├─ /auth/*       → C-BE-AUTH の Express ルータ
+  │           ├─ /posts/*      → C-BE-SUGGEST-BOX
+  │           ├─ /surveys/*    → C-BE-SURVEY
+  │           ├─ /notifications/* → C-BE-NOTIFICATION
+  │           ├─ /reports/*    → C-BE-REPORT
+  │           ├─ /admin/*      → C-BE-ADMIN
+  │           └─ /events/*     → C-BE-EVENT
+  │
+  ├─ pnpm local:web (別ターミナル)
+  │   └─ Next.js dev server (port 3000) → API は localhost:3001
+  │
+  ├─ pnpm local:mobile (別ターミナル)
+  │   └─ Expo dev → API は localhost:3001 (Expo Go アプリで開発機からアクセス)
+  │
+  ├─ pnpm local:trigger-daily (任意)
+  │   └─ EventBridge 9時トリガーの代替
+  │       │
+  │       └─ tsx infra/local/trigger-daily-scheduler.ts
+  │           └─ Step Functions State Machine 相当のロジックを Lambda 直接呼び出しで実行
+  │               ├─ ① Survey Decision Sub-Agent (MockBedrockClient)
+  │               ├─ ② Survey Generation Sub-Agent (MockBedrockClient) → 通知シミュレーション
+  │               ├─ ③ Survey Result Analysis Sub-Agent (MockBedrockClient)
+  │               └─ ④ Event Planning Sub-Agent (MockBedrockClient)
+  │
+  └─ pnpm local:trigger-monthly (任意)
+      └─ EventBridge 月初トリガーの代替
+          └─ Monthly Report Sub-Agent を実行
+
+[ストリーム代替]
+DynamoDB Local の Streams は実際の DynamoDB Streams と互換性があるが、Lambda トリガー連携は手動。
+ローカルでは投稿時に直接 sub-classify Lambda を呼び出す local-stream-handler を用意。
+```
+
+### 環境変数による実装切替
+
+```
+RUNTIME=local
+  ├─ BedrockClient → MockBedrockClient（プリセット応答）
+  ├─ DynamoDB endpoint → http://localhost:8000
+  ├─ S3/SNS/SQS endpoint → http://localhost:4566
+  ├─ Cognito endpoint → http://localhost:9229
+  └─ Lambda は Express サーバとしてローカル実行
+
+RUNTIME=dev
+  ├─ BedrockClient → RealBedrockClient
+  ├─ DynamoDB endpoint → 自動（AWS SDK デフォルト = ap-northeast-1）
+  ├─ S3/SNS/SQS endpoint → 自動
+  ├─ Cognito endpoint → 自動
+  └─ Lambda は AWS Lambda として実行（API Gateway 経由）
+
+RUNTIME=prod (Phase 2)
+  ├─ 同上 dev と同じ
+  └─ ただし Lambda の reserved concurrency / Provisioned Concurrency 等で本番チューニング
+```
+
+### MockBedrockClient の応答戦略
+
+| プロンプト種別 | デフォルト応答 | 制御環境変数 |
+|---|---|---|
+| Post Classification | 入力テキストの単純キーワードマッチで5カテゴリのいずれかを返す | – |
+| Survey Decision | デフォルト: shouldDeliver=true | `MOCK_DELIVER=false` で配信スキップ |
+| Survey Generation | プリセット5問（学校行事・季節ベース）| – |
+| Survey Result Analysis | デフォルト: nextAction=NO_ACTION | `MOCK_NEXT_ACTION=EVENT_PLAN` 等で制御 |
+| Event Planning | プリセット企画案テンプレート（運動会・学習発表会など）| `MOCK_EVENT_TEMPLATE=*` |
+| Monthly Report | プリセットレポートテンプレート | – |
+
+→ **ローカル開発でも UI 動作・状態遷移・E2E フローを完全に検証可能**
 
 ---
 

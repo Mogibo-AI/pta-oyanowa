@@ -351,6 +351,51 @@ Level 0: AWS Services (Cognito, DynamoDB, S3, SNS, EventBridge, Bedrock)
 
 ---
 
+## 7.5. ローカル開発の依存切替（追加要望6）
+
+### 環境変数 RUNTIME による依存ターゲット切替
+
+すべての外部サービスへの依存は、環境変数 `RUNTIME` に応じて自動切替されます。
+これにより、コードを変更せずにローカル/dev/prod を切り替え可能です。
+
+| 依存先 | RUNTIME=local | RUNTIME=dev | RUNTIME=prod |
+|---|---|---|---|
+| **Bedrock** | MockBedrockClient（プリセット応答）| RealBedrockClient → AWS Bedrock（東京）| 同 dev |
+| **DynamoDB** | DynamoDB Local（http://localhost:8000）| AWS DynamoDB | 同 dev |
+| **S3** | LocalStack S3（http://localhost:4566）| AWS S3 | 同 dev |
+| **SNS** | LocalStack SNS（同上）| AWS SNS | 同 dev |
+| **SQS** | LocalStack SQS（同上）| AWS SQS | 同 dev |
+| **EventBridge** | npm script で手動 invoke（実体なし）| AWS EventBridge | 同 dev |
+| **Step Functions** | local-orchestrator.ts（TypeScript で State Machine 等価実装）| AWS Step Functions | 同 dev |
+| **Cognito** | cognito-local（http://localhost:9229）| AWS Cognito | 同 dev |
+| **API Gateway** | C-LOCAL-SERVER（Express on port 3001）| AWS API Gateway | 同 dev |
+
+### 切替ポイントの実装責任
+
+| 切替対象 | 実装責任ユニット | 実装方法 |
+|---|---|---|
+| BedrockClient | U-AI-CORE | Factory Pattern + interface 分離 |
+| DynamoDB endpoint | U-SHARED（共通DBラッパー）| 環境変数で `endpoint` 指定 |
+| S3/SNS/SQS endpoint | 各 Backend Lambda | AWS SDK の `endpoint` config 引数 |
+| Cognito endpoint | C-PKG-AUTH (U-SHARED) | 環境変数 |
+| API Gateway / Lambda 実行 | U-LOCAL（**追加要望6で新設**）| Express サーバとして起動 |
+
+### ストリーム代替
+
+DynamoDB Local の Streams は実際と互換ですが、Lambda 自動トリガーは LocalStack でも限定的なため、ローカルでは以下のいずれかを採用:
+- (a) **投稿/更新時に直接 sub-* Lambda を invoke**（`backend/local-server/middleware/stream-emulator.ts`）
+- (b) **手動トリガー npm script** で投稿一覧から未分類投稿を抽出して sub-classify を実行
+
+MVP では (a) シンプル版を採用。
+
+### Cognito ローカル時の認証フロー簡略化
+
+cognito-local は本物の Cognito API を提供しますが、開発効率のため:
+- ローカル時は **fake JWT 発行ツール** (`infra/local/issue-fake-jwt.ts`) で任意の保護者・管理者のトークンを生成可能
+- C-AUTHZ Lambda Authorizer をローカルでは Express middleware に変換（`localAuthMiddleware`）
+
+---
+
 ## 8. CDK スタック間の依存
 
 ```
