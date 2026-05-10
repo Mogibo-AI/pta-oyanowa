@@ -5,7 +5,7 @@
 - **Project Type**: Greenfield
 - **Start Date**: 2026-05-09T00:00:00Z
 - **Current Phase**: INCEPTION
-- **Current Stage**: Workspace Detection (完了) → Requirements Analysis (次)
+- **Current Stage**: Requirements Analysis (完了 / 承認待ち) → User Stories or Workflow Planning (次)
 
 ## Workspace State
 - **Existing Code**: No
@@ -25,20 +25,21 @@
 - **Structure patterns**: テクニカル環境ドキュメントの「プロジェクト構造」に準拠
 
 ## Extension Configuration
-（Requirements Analysis でユーザー回答後に確定）
-- **Security Baseline**: TBD（Requirements Analysis で確認）
-- **Property-Based Testing**: TBD（Requirements Analysis で確認）
+| Extension | Enabled | Mode | Decided At |
+|---|---|---|---|
+| Security Baseline | Yes | Full（全15ルール強制） | Requirements Analysis (2026-05-09) |
+| Property-Based Testing | Yes | Partial（PBT-02, 03, 07, 08, 09 のみ強制、他はアドバイザリ） | Requirements Analysis (2026-05-09) |
 
 ## Stage Progress
 
 ### INCEPTION PHASE
 - [x] Workspace Detection — Greenfield 確定（2026-05-09）
 - [ ] Reverse Engineering — SKIP（Greenfield のため）
-- [ ] Requirements Analysis — 進行中
-- [ ] User Stories — TBD
+- [x] Requirements Analysis — 完了（2026-05-09、ユーザー承認待ち）
+- [ ] User Stories — TBD（Workflow Planning で判定予定、推奨: 実施）
 - [ ] Workflow Planning — TBD
-- [ ] Application Design — TBD
-- [ ] Units Generation — TBD
+- [ ] Application Design — TBD（推奨: 実施）
+- [ ] Units Generation — TBD（推奨: 実施）
 
 ### CONSTRUCTION PHASE
 - [ ] Per-Unit Loop — TBD
